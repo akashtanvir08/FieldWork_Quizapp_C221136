@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../data/local_data.dart';
 import '../models/user_model.dart';
+import '../models/subject_model.dart';
 import '../services/storage_service.dart';
+import '../services/database_helper.dart';
 import '../widgets/subject_card.dart';
 import 'quiz_screen.dart';
 
@@ -15,6 +16,7 @@ class SubjectListScreen extends StatefulWidget {
 
 class _SubjectListScreenState extends State<SubjectListScreen> {
   User? _currentUser;
+  List<Subject> _subjects = [];
   bool _isLoading = true;
 
   @override
@@ -28,8 +30,10 @@ class _SubjectListScreenState extends State<SubjectListScreen> {
       _isLoading = true;
     });
     final user = await StorageService.instance.getCurrentUser();
+    final subjects = await DatabaseHelper.instance.getAllSubjects();
     setState(() {
       _currentUser = user;
+      _subjects = subjects;
       _isLoading = false;
     });
   }
@@ -117,28 +121,35 @@ class _SubjectListScreenState extends State<SubjectListScreen> {
 
               // List of Subjects
               Expanded(
-                child: ListView.builder(
-                  itemCount: quizSubjects.length,
-                  physics: const BouncingScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    final subject = quizSubjects[index];
-                    final highestScore = _currentUser?.highestScores[subject.name];
-                    return SubjectCard(
-                      subject: subject,
-                      highestScore: highestScore,
-                      totalQuestions: subject.questions.length,
-                      onTap: () async {
-                        // Open QuizScreen and reload user data on return (to show new scores)
-                        await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => QuizScreen(subject: subject),
-                          ),
-                        );
-                        _loadUserData();
-                      },
-                    );
-                  },
-                ),
+                child: _subjects.isEmpty
+                    ? Center(
+                        child: Text(
+                          'No subjects available. Ask an Admin to add some!',
+                          style: GoogleFonts.inter(color: Colors.white38),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: _subjects.length,
+                        physics: const BouncingScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          final subject = _subjects[index];
+                          final highestScore = _currentUser?.highestScores[subject.name];
+                          return SubjectCard(
+                            subject: subject,
+                            highestScore: highestScore,
+                            totalQuestions: subject.questions.length,
+                            onTap: () async {
+                              // Open QuizScreen and reload user data on return (to show new scores)
+                              await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => QuizScreen(subject: subject),
+                                ),
+                              );
+                              _loadUserData();
+                            },
+                          );
+                        },
+                      ),
               ),
             ],
           ),

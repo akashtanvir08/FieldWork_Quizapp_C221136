@@ -18,6 +18,8 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _isLoading = false;
   String? _errorMessage;
 
+  String _selectedRole = 'student';
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -38,7 +40,12 @@ class _SignupScreenState extends State<SignupScreen> {
     final username = _usernameController.text.trim();
     final password = _passwordController.text;
 
-    final success = await StorageService.instance.signUpUser(name, username, password);
+    final success = await StorageService.instance.signUpUser(
+      name,
+      username,
+      password,
+      role: _selectedRole,
+    );
 
     setState(() {
       _isLoading = false;
@@ -279,7 +286,30 @@ class _SignupScreenState extends State<SignupScreen> {
                               return null;
                             },
                           ),
-                          const SizedBox(height: 24.0),
+                          const SizedBox(height: 20.0),
+
+                          // Role Selection Field
+                          Text(
+                            'Register as:',
+                            style: GoogleFonts.inter(
+                              color: Colors.white70,
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 8.0),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildRoleCard('Student', Icons.school_rounded, 'student'),
+                              ),
+                              const SizedBox(width: 16.0),
+                              Expanded(
+                                child: _buildRoleCard('Admin', Icons.admin_panel_settings_rounded, 'admin'),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 28.0),
 
                           CustomButton(
                             text: 'Sign Up',
@@ -295,6 +325,48 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRoleCard(String title, IconData icon, String role) {
+    final isSelected = _selectedRole == role;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedRole = role;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? const Color(0xFF6366F1).withOpacity(0.15)
+              : Colors.white.withOpacity(0.04),
+          borderRadius: BorderRadius.circular(16.0),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF6366F1) : Colors.white.withOpacity(0.08),
+            width: 1.5,
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? const Color(0xFF6366F1) : Colors.white60,
+              size: 28.0,
+            ),
+            const SizedBox(height: 8.0),
+            Text(
+              title,
+              style: GoogleFonts.inter(
+                color: isSelected ? Colors.white : Colors.white60,
+                fontSize: 14.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
       ),
     );

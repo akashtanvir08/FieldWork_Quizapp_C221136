@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import '../models/user_model.dart';
+import '../services/storage_service.dart';
 import 'subject_list_screen.dart';
 import 'profile_screen.dart';
+import 'admin_dashboard_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -10,6 +13,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  User? _currentUser;
+  bool _isLoading = true;
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
@@ -18,7 +23,35 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _loadUser();
+  }
+
+  void _loadUser() async {
+    final user = await StorageService.instance.getCurrentUser();
+    setState(() {
+      _currentUser = user;
+      _isLoading = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        backgroundColor: Color(0xFF0F172A),
+        body: Center(
+          child: CircularProgressIndicator(color: Color(0xFF6366F1)),
+        ),
+      );
+    }
+
+    // Direct admin users to the AdminDashboardScreen
+    if (_currentUser?.role == 'admin') {
+      return const AdminDashboardScreen();
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A), // Sleek background color
       body: IndexedStack(

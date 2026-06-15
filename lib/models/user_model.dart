@@ -4,6 +4,7 @@ class User {
   final String username;
   final String name;
   final String password;
+  final String role; // 'student' or 'admin'
   final Map<String, int> highestScores; // subjectName -> highestScore
   final Map<String, int> lastScores;     // subjectName -> lastScore
   final Map<String, bool> lastPassStatus; // subjectName -> passed (true/false)
@@ -12,6 +13,7 @@ class User {
     required this.username,
     required this.name,
     required this.password,
+    this.role = 'student',
     required this.highestScores,
     required this.lastScores,
     required this.lastPassStatus,
@@ -22,6 +24,7 @@ class User {
       'username': username,
       'name': name,
       'password': password,
+      'role': role,
       'highestScores': highestScores,
       'lastScores': lastScores,
       'lastPassStatus': lastPassStatus,
@@ -33,6 +36,7 @@ class User {
       username: map['username'] as String,
       name: map['name'] as String,
       password: map['password'] as String,
+      role: map['role'] as String? ?? 'student',
       highestScores: Map<String, int>.from(map['highestScores'] ?? {}),
       lastScores: Map<String, int>.from(map['lastScores'] ?? {}),
       lastPassStatus: Map<String, bool>.from(map['lastPassStatus'] ?? {}),

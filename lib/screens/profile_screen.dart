@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/user_model.dart';
+import '../models/subject_model.dart';
 import '../services/storage_service.dart';
-import '../data/local_data.dart';
+import '../services/database_helper.dart';
 import 'login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -14,6 +15,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   User? _currentUser;
+  List<Subject> _subjects = [];
   bool _isLoading = true;
 
   @override
@@ -27,8 +29,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _isLoading = true;
     });
     final user = await StorageService.instance.getCurrentUser();
+    final subjects = await DatabaseHelper.instance.getAllSubjects();
     setState(() {
       _currentUser = user;
+      _subjects = subjects;
       _isLoading = false;
     });
   }
@@ -179,7 +183,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 16.0),
 
               // Dynamic score list
-              ...quizSubjects.map((sub) {
+              ..._subjects.map((sub) {
                 final lastScore = _currentUser?.lastScores[sub.name];
                 final highestScore = _currentUser?.highestScores[sub.name];
                 final passed = _currentUser?.lastPassStatus[sub.name];

@@ -59,207 +59,155 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF0F172A), Color(0xFF1E293B)], // Dark sleek slate
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: SafeArea(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: SafeArea(
+        child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 28.0),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: SizedBox(
-              height: size.height - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom,
+              width: size.width > 500 ? 450 : double.infinity,
               child: Form(
                 key: _formKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Spacer(flex: 2),
-                    // Title
                     Text(
                       'Welcome Back',
+                      textAlign: TextAlign.center,
                       style: GoogleFonts.outfit(
-                        color: Colors.white,
-                        fontSize: 36.0,
+                        color: theme.colorScheme.onSurface,
+                        fontSize: 32.0,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 8.0),
                     Text(
                       'Sign in to test your knowledge offline!',
+                      textAlign: TextAlign.center,
                       style: GoogleFonts.inter(
-                        color: Colors.white70,
-                        fontSize: 16.0,
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontSize: 15.0,
                       ),
                     ),
-                    const Spacer(flex: 1),
-
-                    // Inputs card
-                    Container(
-                      padding: const EdgeInsets.all(24.0),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(24.0),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.1),
-                          width: 1.5,
+                    const SizedBox(height: 32.0),
+                    Card(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        side: BorderSide(
+                          color: theme.colorScheme.outlineVariant.withOpacity(0.5),
                         ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (_errorMessage != null) ...[
-                            Container(
-                              padding: const EdgeInsets.all(12.0),
-                              decoration: BoxDecoration(
-                                color: Colors.redAccent.withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(12.0),
-                                border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
-                              ),
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.error_outline_rounded, color: Colors.redAccent, size: 20.0),
-                                  const SizedBox(width: 10.0),
-                                  Expanded(
-                                    child: Text(
-                                      _errorMessage!,
-                                      style: const TextStyle(color: Colors.redAccent, fontSize: 14.0),
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            if (_errorMessage != null) ...[
+                              Container(
+                                padding: const EdgeInsets.all(12.0),
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.errorContainer,
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.error_outline_rounded,
+                                      color: theme.colorScheme.error,
+                                      size: 20.0,
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 16.0),
-                          ],
-
-                          // Username Field
-                          Text(
-                            'Username',
-                            style: GoogleFonts.inter(
-                              color: Colors.white70,
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 8.0),
-                          TextFormField(
-                            controller: _usernameController,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              hintText: 'Enter your username',
-                              hintStyle: const TextStyle(color: Colors.white30),
-                              filled: true,
-                              fillColor: Colors.white.withOpacity(0.05),
-                              prefixIcon: const Icon(Icons.person_outline_rounded, color: Colors.white54),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16.0),
-                                borderSide: BorderSide.none,
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16.0),
-                                borderSide: BorderSide(color: Colors.white.withOpacity(0.05)),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16.0),
-                                borderSide: const BorderSide(color: Color(0xFF6366F1), width: 1.5),
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Please enter your username';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 20.0),
-
-                          // Password Field
-                          Text(
-                            'Password',
-                            style: GoogleFonts.inter(
-                              color: Colors.white70,
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 8.0),
-                          TextFormField(
-                            controller: _passwordController,
-                            obscureText: true,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              hintText: 'Enter your password',
-                              hintStyle: const TextStyle(color: Colors.white30),
-                              filled: true,
-                              fillColor: Colors.white.withOpacity(0.05),
-                              prefixIcon: const Icon(Icons.lock_outline_rounded, color: Colors.white54),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16.0),
-                                borderSide: BorderSide.none,
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16.0),
-                                borderSide: BorderSide(color: Colors.white.withOpacity(0.05)),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16.0),
-                                borderSide: const BorderSide(color: Color(0xFF6366F1), width: 1.5),
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your password';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 24.0),
-
-                          CustomButton(
-                            text: 'Sign In',
-                            onPressed: _login,
-                            isLoading: _isLoading,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const Spacer(flex: 1),
-
-                    // Signup navigate
-                    Center(
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => const SignupScreen()),
-                          );
-                        },
-                        child: RichText(
-                          text: TextSpan(
-                            text: "Don't have an account? ",
-                            style: GoogleFonts.inter(color: Colors.white54, fontSize: 14.0),
-                            children: [
-                              TextSpan(
-                                text: 'Sign Up',
-                                style: GoogleFonts.inter(
-                                  color: const Color(0xFF6366F1),
-                                  fontWeight: FontWeight.bold,
+                                    const SizedBox(width: 10.0),
+                                    Expanded(
+                                      child: Text(
+                                        _errorMessage!,
+                                        style: TextStyle(
+                                          color: theme.colorScheme.onErrorContainer,
+                                          fontSize: 14.0,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
+                              const SizedBox(height: 16.0),
                             ],
-                          ),
+                            TextFormField(
+                              controller: _usernameController,
+                              decoration: InputDecoration(
+                                labelText: 'Username',
+                                hintText: 'Enter your username',
+                                prefixIcon: const Icon(Icons.person_outline_rounded),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Please enter your username';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 20.0),
+                            TextFormField(
+                              controller: _passwordController,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                hintText: 'Enter your password',
+                                prefixIcon: const Icon(Icons.lock_outline_rounded),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your password';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 24.0),
+                            CustomButton(
+                              text: 'Sign In',
+                              onPressed: _login,
+                              isLoading: _isLoading,
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                    const Spacer(flex: 2),
+                    const SizedBox(height: 24.0),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const SignupScreen()),
+                        );
+                      },
+                      child: RichText(
+                        text: TextSpan(
+                          text: "Don't have an account? ",
+                          style: GoogleFonts.inter(
+                            color: theme.colorScheme.onSurfaceVariant,
+                            fontSize: 14.0,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: 'Sign Up',
+                              style: GoogleFonts.inter(
+                                color: theme.colorScheme.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

@@ -10,12 +10,12 @@ final List<Subject> quizSubjects = [
       Question(
         questionText: 'What is the value of 5 + 7 * 2?',
         options: ['24', '19', '17', '22'],
-        correctAnswerIndex: 1, // 5 + 14 = 19
+        correctAnswerIndex: 1,
       ),
       Question(
         questionText: 'Solve for x: 3x - 7 = 8',
         options: ['x = 3', 'x = 4', 'x = 5', 'x = 6'],
-        correctAnswerIndex: 2, // 3x = 15 => x = 5
+        correctAnswerIndex: 2,
       ),
       Question(
         questionText: 'What is the square root of 144?',
@@ -94,7 +94,7 @@ final List<Subject> quizSubjects = [
       Question(
         questionText: 'Complete the sentence: "Neither of the options ___ correct."',
         options: ['are', 'is', 'were', 'am'],
-        correctAnswerIndex: 1, // "Neither ... is"
+        correctAnswerIndex: 1,
       ),
     ],
   ),

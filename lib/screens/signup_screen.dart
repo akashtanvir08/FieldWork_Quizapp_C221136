@@ -17,7 +17,6 @@ class _SignupScreenState extends State<SignupScreen> {
   final _passwordController = TextEditingController();
   bool _isLoading = false;
   String? _errorMessage;
-
   String _selectedRole = 'student';
 
   @override
@@ -59,7 +58,7 @@ class _SignupScreenState extends State<SignupScreen> {
             backgroundColor: Colors.green,
           ),
         );
-        Navigator.of(context).pop(); // Go back to login
+        Navigator.of(context).pop();
       }
     } else {
       setState(() {
@@ -71,255 +70,183 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_rounded, color: theme.colorScheme.onSurface),
+          onPressed: () => Navigator.of(context).pop(),
         ),
-        child: SafeArea(
+      ),
+      body: SafeArea(
+        child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 28.0),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: SizedBox(
-              height: size.height - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom,
+              width: size.width > 500 ? 450 : double.infinity,
               child: Form(
                 key: _formKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Spacer(flex: 1),
-                    // Back button
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                    const Spacer(flex: 1),
-                    // Title
                     Text(
                       'Create Account',
+                      textAlign: TextAlign.center,
                       style: GoogleFonts.outfit(
-                        color: Colors.white,
-                        fontSize: 36.0,
+                        color: theme.colorScheme.onSurface,
+                        fontSize: 32.0,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 8.0),
                     Text(
                       'Join the offline quiz hub today!',
+                      textAlign: TextAlign.center,
                       style: GoogleFonts.inter(
-                        color: Colors.white70,
-                        fontSize: 16.0,
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontSize: 15.0,
                       ),
                     ),
-                    const Spacer(flex: 1),
-
-                    // Inputs card
-                    Container(
-                      padding: const EdgeInsets.all(24.0),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(24.0),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.1),
-                          width: 1.5,
+                    const SizedBox(height: 32.0),
+                    Card(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        side: BorderSide(
+                          color: theme.colorScheme.outlineVariant.withOpacity(0.5),
                         ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (_errorMessage != null) ...[
-                            Container(
-                              padding: const EdgeInsets.all(12.0),
-                              decoration: BoxDecoration(
-                                color: Colors.redAccent.withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(12.0),
-                                border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
-                              ),
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.error_outline_rounded, color: Colors.redAccent, size: 20.0),
-                                  const SizedBox(width: 10.0),
-                                  Expanded(
-                                    child: Text(
-                                      _errorMessage!,
-                                      style: const TextStyle(color: Colors.redAccent, fontSize: 14.0),
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            if (_errorMessage != null) ...[
+                              Container(
+                                padding: const EdgeInsets.all(12.0),
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.errorContainer,
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.error_outline_rounded,
+                                      color: theme.colorScheme.error,
+                                      size: 20.0,
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(width: 10.0),
+                                    Expanded(
+                                      child: Text(
+                                        _errorMessage!,
+                                        style: TextStyle(
+                                          color: theme.colorScheme.onErrorContainer,
+                                          fontSize: 14.0,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
+                              const SizedBox(height: 16.0),
+                            ],
+                            TextFormField(
+                              controller: _nameController,
+                              decoration: InputDecoration(
+                                labelText: 'Full Name',
+                                hintText: 'Enter your full name',
+                                prefixIcon: const Icon(Icons.badge_outlined),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Please enter your full name';
+                                }
+                                return null;
+                              },
                             ),
                             const SizedBox(height: 16.0),
+                            TextFormField(
+                              controller: _usernameController,
+                              decoration: InputDecoration(
+                                labelText: 'Username',
+                                hintText: 'Choose a username',
+                                prefixIcon: const Icon(Icons.person_outline_rounded),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Please choose a username';
+                                }
+                                if (value.trim().length < 3) {
+                                  return 'Username must be at least 3 characters';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 16.0),
+                            TextFormField(
+                              controller: _passwordController,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                hintText: 'Create a password',
+                                prefixIcon: const Icon(Icons.lock_outline_rounded),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter a password';
+                                }
+                                if (value.length < 6) {
+                                  return 'Password must be at least 6 characters';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 20.0),
+                            Text(
+                              'Register as:',
+                              style: TextStyle(
+                                color: theme.colorScheme.onSurfaceVariant,
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 8.0),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildRoleCard(theme, 'Student', Icons.school_rounded, 'student'),
+                                ),
+                                const SizedBox(width: 16.0),
+                                Expanded(
+                                  child: _buildRoleCard(theme, 'Admin', Icons.admin_panel_settings_rounded, 'admin'),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 28.0),
+                            CustomButton(
+                              text: 'Sign Up',
+                              onPressed: _signup,
+                              isLoading: _isLoading,
+                            ),
                           ],
-
-                          // Full Name Field
-                          Text(
-                            'Full Name',
-                            style: GoogleFonts.inter(
-                              color: Colors.white70,
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 8.0),
-                          TextFormField(
-                            controller: _nameController,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              hintText: 'Enter your full name',
-                              hintStyle: const TextStyle(color: Colors.white30),
-                              filled: true,
-                              fillColor: Colors.white.withOpacity(0.05),
-                              prefixIcon: const Icon(Icons.badge_outlined, color: Colors.white54),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16.0),
-                                borderSide: BorderSide.none,
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16.0),
-                                borderSide: BorderSide(color: Colors.white.withOpacity(0.05)),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16.0),
-                                borderSide: const BorderSide(color: Color(0xFF6366F1), width: 1.5),
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Please enter your full name';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 16.0),
-
-                          // Username Field
-                          Text(
-                            'Username',
-                            style: GoogleFonts.inter(
-                              color: Colors.white70,
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 8.0),
-                          TextFormField(
-                            controller: _usernameController,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              hintText: 'Choose a username',
-                              hintStyle: const TextStyle(color: Colors.white30),
-                              filled: true,
-                              fillColor: Colors.white.withOpacity(0.05),
-                              prefixIcon: const Icon(Icons.person_outline_rounded, color: Colors.white54),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16.0),
-                                borderSide: BorderSide.none,
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16.0),
-                                borderSide: BorderSide(color: Colors.white.withOpacity(0.05)),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16.0),
-                                borderSide: const BorderSide(color: Color(0xFF6366F1), width: 1.5),
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Please choose a username';
-                              }
-                              if (value.trim().length < 3) {
-                                return 'Username must be at least 3 characters';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 16.0),
-
-                          // Password Field
-                          Text(
-                            'Password',
-                            style: GoogleFonts.inter(
-                              color: Colors.white70,
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 8.0),
-                          TextFormField(
-                            controller: _passwordController,
-                            obscureText: true,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              hintText: 'Create a password',
-                              hintStyle: const TextStyle(color: Colors.white30),
-                              filled: true,
-                              fillColor: Colors.white.withOpacity(0.05),
-                              prefixIcon: const Icon(Icons.lock_outline_rounded, color: Colors.white54),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16.0),
-                                borderSide: BorderSide.none,
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16.0),
-                                borderSide: BorderSide(color: Colors.white.withOpacity(0.05)),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16.0),
-                                borderSide: const BorderSide(color: Color(0xFF6366F1), width: 1.5),
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter a password';
-                              }
-                              if (value.length < 6) {
-                                return 'Password must be at least 6 characters';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 20.0),
-
-                          // Role Selection Field
-                          Text(
-                            'Register as:',
-                            style: GoogleFonts.inter(
-                              color: Colors.white70,
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 8.0),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _buildRoleCard('Student', Icons.school_rounded, 'student'),
-                              ),
-                              const SizedBox(width: 16.0),
-                              Expanded(
-                                child: _buildRoleCard('Admin', Icons.admin_panel_settings_rounded, 'admin'),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 28.0),
-
-                          CustomButton(
-                            text: 'Sign Up',
-                            onPressed: _signup,
-                            isLoading: _isLoading,
-                          ),
-                        ],
+                        ),
                       ),
                     ),
-                    const Spacer(flex: 3),
+                    const SizedBox(height: 24.0),
                   ],
                 ),
               ),
@@ -330,7 +257,7 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  Widget _buildRoleCard(String title, IconData icon, String role) {
+  Widget _buildRoleCard(ThemeData theme, String title, IconData icon, String role) {
     final isSelected = _selectedRole == role;
     return GestureDetector(
       onTap: () {
@@ -338,35 +265,36 @@ class _SignupScreenState extends State<SignupScreen> {
           _selectedRole = role;
         });
       },
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFF6366F1).withOpacity(0.15)
-              : Colors.white.withOpacity(0.04),
-          borderRadius: BorderRadius.circular(16.0),
-          border: Border.all(
-            color: isSelected ? const Color(0xFF6366F1) : Colors.white.withOpacity(0.08),
-            width: 1.5,
+      child: Card(
+        elevation: 0,
+        color: isSelected ? theme.colorScheme.primaryContainer : theme.colorScheme.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          side: BorderSide(
+            color: isSelected ? theme.colorScheme.primary : theme.colorScheme.outlineVariant,
+            width: isSelected ? 2.0 : 1.0,
           ),
         ),
-        child: Column(
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? const Color(0xFF6366F1) : Colors.white60,
-              size: 28.0,
-            ),
-            const SizedBox(height: 8.0),
-            Text(
-              title,
-              style: GoogleFonts.inter(
-                color: isSelected ? Colors.white : Colors.white60,
-                fontSize: 14.0,
-                fontWeight: FontWeight.bold,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
+          child: Column(
+            children: [
+              Icon(
+                icon,
+                color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
+                size: 24.0,
               ),
-            ),
-          ],
+              const SizedBox(height: 6.0),
+              Text(
+                title,
+                style: TextStyle(
+                  color: isSelected ? theme.colorScheme.onPrimaryContainer : theme.colorScheme.onSurfaceVariant,
+                  fontSize: 13.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

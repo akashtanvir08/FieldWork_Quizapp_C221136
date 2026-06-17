@@ -40,24 +40,23 @@ class _SubjectListScreenState extends State<SubjectListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     if (_isLoading) {
       return const Scaffold(
-        backgroundColor: Color(0xFF0F172A),
         body: Center(
-          child: CircularProgressIndicator(color: Color(0xFF6366F1)),
+          child: CircularProgressIndicator(),
         ),
       );
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 0.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // User profile greeting
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -66,8 +65,8 @@ class _SubjectListScreenState extends State<SubjectListScreen> {
                     children: [
                       Text(
                         'Hello,',
-                        style: GoogleFonts.inter(
-                          color: Colors.white60,
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurfaceVariant,
                           fontSize: 16.0,
                         ),
                       ),
@@ -75,7 +74,7 @@ class _SubjectListScreenState extends State<SubjectListScreen> {
                       Text(
                         _currentUser?.name ?? 'Guest',
                         style: GoogleFonts.outfit(
-                          color: Colors.white,
+                          color: theme.colorScheme.onSurface,
                           fontSize: 26.0,
                           fontWeight: FontWeight.bold,
                         ),
@@ -84,13 +83,13 @@ class _SubjectListScreenState extends State<SubjectListScreen> {
                   ),
                   CircleAvatar(
                     radius: 26.0,
-                    backgroundColor: const Color(0xFF6366F1).withOpacity(0.2),
+                    backgroundColor: theme.colorScheme.primaryContainer,
                     child: Text(
                       (_currentUser?.name.isNotEmpty ?? false)
                           ? _currentUser!.name[0].toUpperCase()
                           : 'U',
                       style: GoogleFonts.outfit(
-                        color: const Color(0xFF6366F1),
+                        color: theme.colorScheme.onPrimaryContainer,
                         fontSize: 20.0,
                         fontWeight: FontWeight.bold,
                       ),
@@ -99,12 +98,10 @@ class _SubjectListScreenState extends State<SubjectListScreen> {
                 ],
               ),
               const SizedBox(height: 36.0),
-
-              // Title
               Text(
                 'Choose a Subject',
                 style: GoogleFonts.outfit(
-                  color: Colors.white,
+                  color: theme.colorScheme.onSurface,
                   fontSize: 22.0,
                   fontWeight: FontWeight.bold,
                 ),
@@ -112,20 +109,18 @@ class _SubjectListScreenState extends State<SubjectListScreen> {
               const SizedBox(height: 6.0),
               Text(
                 'Select a category to start the 30-second-per-question quiz.',
-                style: GoogleFonts.inter(
-                  color: Colors.white60,
+                style: TextStyle(
+                  color: theme.colorScheme.onSurfaceVariant,
                   fontSize: 14.0,
                 ),
               ),
               const SizedBox(height: 24.0),
-
-              // List of Subjects
               Expanded(
                 child: _subjects.isEmpty
                     ? Center(
                         child: Text(
                           'No subjects available. Ask an Admin to add some!',
-                          style: GoogleFonts.inter(color: Colors.white38),
+                          style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
                         ),
                       )
                     : ListView.builder(
@@ -139,7 +134,6 @@ class _SubjectListScreenState extends State<SubjectListScreen> {
                             highestScore: highestScore,
                             totalQuestions: subject.questions.length,
                             onTap: () async {
-                              // Open QuizScreen and reload user data on return (to show new scores)
                               await Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (_) => QuizScreen(subject: subject),

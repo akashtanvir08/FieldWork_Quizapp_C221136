@@ -5,18 +5,15 @@ import 'database_helper.dart';
 class StorageService {
   static const String _keyCurrentUser = 'current_user_username';
 
-  // Private constructor
   StorageService._privateConstructor();
   static final StorageService instance = StorageService._privateConstructor();
 
-  // Initialize helper (optional, SharedPreferences is loaded async)
   Future<SharedPreferences> get _prefs async => await SharedPreferences.getInstance();
 
-  // Signup
   Future<bool> signUpUser(String name, String username, String password, {String role = 'student'}) async {
     final dbUser = await DatabaseHelper.instance.getUser(username);
     if (dbUser != null) {
-      return false; // User already exists
+      return false;
     }
 
     final newUser = User(
@@ -33,32 +30,26 @@ class StorageService {
     return true;
   }
 
-  // Login
   Future<User?> loginUser(String username, String password) async {
     final dbUser = await DatabaseHelper.instance.getUser(username);
     if (dbUser == null) {
-      return null; // User not found
+      return null;
     }
 
     if (dbUser['password'] == password) {
       final prefs = await _prefs;
-      // Save current session in SharedPreferences
       await prefs.setString(_keyCurrentUser, username);
-      
-      // Load user metrics and return complete User object
       return await getCurrentUser();
     }
 
-    return null; // Password mismatch
+    return null;
   }
 
-  // Logout
   Future<void> logout() async {
     final prefs = await _prefs;
     await prefs.remove(_keyCurrentUser);
   }
 
-  // Get current logged-in user
   Future<User?> getCurrentUser() async {
     final prefs = await _prefs;
     final currentUsername = prefs.getString(_keyCurrentUser);
@@ -83,7 +74,6 @@ class StorageService {
     );
   }
 
-  // Update user score
   Future<User?> updateScore(String subjectName, int score, bool passed) async {
     final prefs = await _prefs;
     final currentUsername = prefs.getString(_keyCurrentUser);
@@ -91,9 +81,8 @@ class StorageService {
 
     final db = DatabaseHelper.instance;
     
-    // Find subject ID to calculate total questions
     final subjects = await db.getAllSubjectsRaw();
-    int totalQuestions = 5; // fallback
+    int totalQuestions = 5;
     for (final s in subjects) {
       if (s['name'] == subjectName) {
         final q = await db.getQuestionsForSubjectRaw(s['id'] as int);
@@ -102,7 +91,6 @@ class StorageService {
       }
     }
 
-    // Insert score record
     await db.insertScore(currentUsername, subjectName, score, totalQuestions, passed);
     
     return await getCurrentUser();

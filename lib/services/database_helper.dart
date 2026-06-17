@@ -8,7 +8,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import '../models/user_model.dart';
 import '../models/subject_model.dart';
 import '../models/question_model.dart';
-import '../data/local_data.dart'; // Import static initial questions for seeding
+import '../data/local_data.dart';
 
 class DatabaseHelper {
   static const String _dbName = 'quiz_app.db';
@@ -26,7 +26,6 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDatabase() async {
-    // Initialize FFI for Desktop (Windows, macOS, Linux)
     if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
       sqfliteFfiInit();
       databaseFactory = databaseFactoryFfi;
@@ -48,7 +47,6 @@ class DatabaseHelper {
   }
 
   Future _onCreate(Database db, int version) async {
-    // Create Users Table
     await db.execute('''
       CREATE TABLE users (
         username TEXT PRIMARY KEY,
@@ -58,7 +56,6 @@ class DatabaseHelper {
       )
     ''');
 
-    // Create Subjects Table
     await db.execute('''
       CREATE TABLE subjects (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -68,19 +65,17 @@ class DatabaseHelper {
       )
     ''');
 
-    // Create Questions Table
     await db.execute('''
       CREATE TABLE questions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         subject_id INTEGER NOT NULL,
         question_text TEXT NOT NULL,
-        options TEXT NOT NULL, -- JSON string of List<String>
+        options TEXT NOT NULL,
         correct_answer_index INTEGER NOT NULL,
         FOREIGN KEY (subject_id) REFERENCES subjects (id) ON DELETE CASCADE
       )
     ''');
 
-    // Create Scores Table
     await db.execute('''
       CREATE TABLE scores (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -88,18 +83,16 @@ class DatabaseHelper {
         subject_name TEXT NOT NULL,
         score INTEGER NOT NULL,
         total_questions INTEGER NOT NULL,
-        passed INTEGER NOT NULL, -- 1 = true, 0 = false
+        passed INTEGER NOT NULL,
         timestamp TEXT NOT NULL,
         FOREIGN KEY (username) REFERENCES users (username) ON DELETE CASCADE
       )
     ''');
 
-    // Seed default subjects and questions
     await _seedInitialData(db);
   }
 
   Future<void> _seedInitialData(Database db) async {
-    // Seed an admin user by default
     await db.insert('users', {
       'username': 'admin',
       'name': 'Administrator',
@@ -107,7 +100,6 @@ class DatabaseHelper {
       'role': 'admin',
     });
 
-    // Seed subjects and questions from local_data.dart
     for (final subject in quizSubjects) {
       final subjectId = await db.insert('subjects', {
         'name': subject.name,
@@ -126,19 +118,16 @@ class DatabaseHelper {
     }
   }
 
-  // ================= USERS CRUD =================
-
   Future<int> insertUser(User user) async {
     final db = await database;
     return await db.insert('users', {
       'username': user.username,
       'name': user.name,
       'password': user.password,
-      'role': 'student', // default signed up role
+      'role': 'student',
     });
   }
 
-  // Method to insert admin (called explicitly or for user creation support)
   Future<int> insertUserWithRole(User user, String role) async {
     final db = await database;
     return await db.insert('users', {
@@ -159,8 +148,6 @@ class DatabaseHelper {
     if (results.isEmpty) return null;
     return results.first;
   }
-
-  // ================= SUBJECTS CRUD =================
 
   Future<List<Map<String, dynamic>>> getAllSubjectsRaw() async {
     final db = await database;
@@ -207,8 +194,6 @@ class DatabaseHelper {
     );
   }
 
-  // ================= QUESTIONS CRUD =================
-
   Future<List<Question>> getQuestionsForSubject(int subjectId) async {
     final db = await database;
     final results = await db.query(
@@ -228,7 +213,6 @@ class DatabaseHelper {
     }).toList();
   }
 
-  // Extended for management where we need the question ID
   Future<List<Map<String, dynamic>>> getQuestionsForSubjectRaw(int subjectId) async {
     final db = await database;
     return await db.query(
@@ -271,8 +255,6 @@ class DatabaseHelper {
     );
   }
 
-  // ================= SCORES CRUD =================
-
   Future<int> insertScore(String username, String subjectName, int score, int totalQuestions, bool passed) async {
     final db = await database;
     return await db.insert('scores', {
@@ -297,7 +279,6 @@ class DatabaseHelper {
 
   Future<List<Map<String, dynamic>>> getAllStudentScores() async {
     final db = await database;
-    // Join with users table to get student names
     return await db.rawQuery('''
       SELECT scores.*, users.name as student_name
       FROM scores

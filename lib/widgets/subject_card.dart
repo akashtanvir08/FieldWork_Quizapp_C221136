@@ -28,122 +28,104 @@ class SubjectCard extends StatelessWidget {
     }
   }
 
-  List<Color> _getGradientColors(String subjectName) {
+  Color _getSubjectColor(BuildContext context, String subjectName) {
+    final theme = Theme.of(context);
     switch (subjectName.toLowerCase()) {
       case 'math':
-        return [const Color(0xFFFF9966), const Color(0xFFFF5E62)]; // Orange/Red
+        return Colors.orange;
       case 'science':
-        return [const Color(0xFF00B0FF), const Color(0xFF00E5FF)]; // Cyan/Blue
+        return Colors.teal;
       case 'english':
-        return [const Color(0xFF8E2DE2), const Color(0xFF4A00E0)]; // Purple/Indigo
+        return Colors.purple;
       default:
-        return [const Color(0xFF6366F1), const Color(0xFF4F46E5)];
+        return theme.colorScheme.primary;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final gradient = _getGradientColors(subject.name);
+    final color = _getSubjectColor(context, subject.name);
     final icon = _getIcon(subject.iconName);
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 20.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24.0),
-        gradient: LinearGradient(
-          colors: gradient,
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+    return Card(
+      elevation: 0,
+      margin: const EdgeInsets.only(bottom: 16.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.0),
+        side: BorderSide(
+          color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.5),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: gradient.first.withOpacity(0.3),
-            blurRadius: 15.0,
-            offset: const Offset(0, 8),
-          ),
-        ],
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(24.0),
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Row(
-              children: [
-                // Icon container with Glassmorphism feel
-                Container(
-                  padding: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(18.0),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.3),
-                      width: 1.5,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16.0),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12.0),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                child: Icon(
+                  icon,
+                  size: 28.0,
+                  color: color,
+                ),
+              ),
+              const SizedBox(width: 16.0),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      subject.name,
+                      style: const TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  child: Icon(
-                    icon,
-                    size: 32.0,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(width: 20.0),
-                // Text details
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        subject.name,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
+                    const SizedBox(height: 4.0),
+                    Text(
+                      subject.description,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontSize: 13.0,
+                        height: 1.3,
+                      ),
+                    ),
+                    const SizedBox(height: 8.0),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.emoji_events_rounded,
+                          size: 14.0,
+                          color: Colors.amber[700],
                         ),
-                      ),
-                      const SizedBox(height: 6.0),
-                      Text(
-                        subject.description,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.85),
-                          fontSize: 14.0,
-                          height: 1.3,
+                        const SizedBox(width: 4.0),
+                        Text(
+                          highestScore != null
+                              ? 'Best Score: $highestScore/${totalQuestions ?? 5}'
+                              : 'Best Score: -',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            fontSize: 12.0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 12.0),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.emoji_events_rounded,
-                            size: 16.0,
-                            color: Colors.yellow.shade200,
-                          ),
-                          const SizedBox(width: 6.0),
-                          Text(
-                            highestScore != null
-                                ? 'Best: $highestScore/${totalQuestions ?? 5}'
-                                : 'Best: -',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12.0,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  ],
                 ),
-                // Arrow
-                const Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  color: Colors.white,
-                  size: 20.0,
-                ),
-              ],
-            ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.7),
+                size: 24.0,
+              ),
+            ],
           ),
         ),
       ),

@@ -6,10 +6,7 @@ import 'services/storage_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Check if a user is logged in
   final currentUser = await StorageService.instance.getCurrentUser();
-
   runApp(QuizApp(isLoggedIn: currentUser != null));
 }
 
@@ -24,16 +21,15 @@ class QuizApp extends StatelessWidget {
       title: 'Offline Quiz App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        brightness: Brightness.dark,
-        primaryColor: const Color(0xFF6366F1),
-        scaffoldBackgroundColor: const Color(0xFF0F172A),
-        textTheme: GoogleFonts.interTextTheme(
-          ThemeData.dark().textTheme,
-        ),
+        useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF6366F1),
-          brightness: Brightness.dark,
+          seedColor: Colors.indigo,
+          brightness: Brightness.light,
         ),
+        textTheme: GoogleFonts.interTextTheme(
+          ThemeData.light().textTheme,
+        ),
+        scaffoldBackgroundColor: const Color(0xFFF8FAFC),
       ),
       home: isLoggedIn ? const HomeScreen() : const LoginScreen(),
     );

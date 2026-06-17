@@ -4,10 +4,10 @@ class User {
   final String username;
   final String name;
   final String password;
-  final String role; // 'student' or 'admin'
-  final Map<String, int> highestScores; // subjectName -> highestScore
-  final Map<String, int> lastScores;     // subjectName -> lastScore
-  final Map<String, bool> lastPassStatus; // subjectName -> passed (true/false)
+  final String role;
+  final Map<String, int> highestScores;
+  final Map<String, int> lastScores;
+  final Map<String, bool> lastPassStatus;
 
   User({
     required this.username,

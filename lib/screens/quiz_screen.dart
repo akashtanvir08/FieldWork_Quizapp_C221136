@@ -21,9 +21,8 @@ class _QuizScreenState extends State<QuizScreen> {
   int? _selectedAnswerIndex;
   bool _isAnswered = false;
 
-  // Timer properties
   Timer? _timer;
-  int _timeLeft = 30; // 30 seconds per question
+  int _timeLeft = 30;
 
   @override
   void initState() {
@@ -51,7 +50,6 @@ class _QuizScreenState extends State<QuizScreen> {
           _timeLeft--;
         });
       } else {
-        // Time is up! Auto move or select empty answer
         _timer?.cancel();
         _handleTimeout();
       }
@@ -61,10 +59,9 @@ class _QuizScreenState extends State<QuizScreen> {
   void _handleTimeout() {
     setState(() {
       _isAnswered = true;
-      _selectedAnswerIndex = -1; // Indicates time-out/no answer
+      _selectedAnswerIndex = -1;
     });
 
-    // Wait a brief second to let user see they timed out, then go to next question
     Future.delayed(const Duration(milliseconds: 1500), () {
       if (mounted) {
         _goToNextQuestion();
@@ -73,9 +70,9 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   void _selectAnswer(int index) {
-    if (_isAnswered) return; // Prevent multiple selection
+    if (_isAnswered) return;
 
-    _timer?.cancel(); // Pause the timer
+    _timer?.cancel();
 
     final currentQuestion = widget.subject.questions[_currentQuestionIndex];
     final isCorrect = index == currentQuestion.correctAnswerIndex;
@@ -88,7 +85,6 @@ class _QuizScreenState extends State<QuizScreen> {
       }
     });
 
-    // Delay showing next question to let user see feedback (correct/incorrect)
     Future.delayed(const Duration(milliseconds: 1500), () {
       if (mounted) {
         _goToNextQuestion();
@@ -103,7 +99,6 @@ class _QuizScreenState extends State<QuizScreen> {
       });
       _startTimer();
     } else {
-      // Completed the quiz! Save score and navigate to ResultScreen
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (_) => ResultScreen(
@@ -118,46 +113,41 @@ class _QuizScreenState extends State<QuizScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final currentQuestion = widget.subject.questions[_currentQuestionIndex];
     final percent = _timeLeft / 30.0;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
         title: Text(
           widget.subject.name,
           style: GoogleFonts.outfit(
-            color: Colors.white,
+            color: theme.colorScheme.onSurface,
             fontSize: 20.0,
             fontWeight: FontWeight.bold,
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.close_rounded, color: Colors.white),
+          icon: Icon(Icons.close_rounded, color: theme.colorScheme.onSurface),
           onPressed: () {
-            // Confirm quit dialog
             showDialog(
               context: context,
               builder: (context) => AlertDialog(
-                backgroundColor: const Color(0xFF1E293B),
-                title: const Text('Quit Quiz?', style: TextStyle(color: Colors.white)),
+                title: const Text('Quit Quiz?'),
                 content: const Text(
                   'Are you sure you want to quit? Your current progress will be lost.',
-                  style: TextStyle(color: Colors.white70),
                 ),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+                    child: Text('Cancel', style: TextStyle(color: theme.colorScheme.onSurfaceVariant)),
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.of(context).pop(); // Close dialog
-                      Navigator.of(context).pop(); // Close quiz screen
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
                     },
-                    child: const Text('Quit', style: TextStyle(color: Colors.redAccent)),
+                    child: Text('Quit', style: TextStyle(color: theme.colorScheme.error)),
                   ),
                 ],
               ),
@@ -172,12 +162,11 @@ class _QuizScreenState extends State<QuizScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 10.0),
-              // Timer Progress Bar
               Row(
                 children: [
                   Icon(
                     Icons.timer_rounded,
-                    color: _timeLeft <= 10 ? Colors.redAccent : const Color(0xFF6366F1),
+                    color: _timeLeft <= 10 ? theme.colorScheme.error : theme.colorScheme.primary,
                   ),
                   const SizedBox(width: 10.0),
                   Expanded(
@@ -186,8 +175,8 @@ class _QuizScreenState extends State<QuizScreen> {
                       lineHeight: 8.0,
                       percent: percent,
                       barRadius: const Radius.circular(4.0),
-                      progressColor: _timeLeft <= 10 ? Colors.redAccent : const Color(0xFF6366F1),
-                      backgroundColor: Colors.white.withOpacity(0.1),
+                      progressColor: _timeLeft <= 10 ? theme.colorScheme.error : theme.colorScheme.primary,
+                      backgroundColor: theme.colorScheme.outlineVariant.withOpacity(0.5),
                       animation: false,
                     ),
                   ),
@@ -195,7 +184,7 @@ class _QuizScreenState extends State<QuizScreen> {
                   Text(
                     '${_timeLeft}s',
                     style: GoogleFonts.outfit(
-                      color: _timeLeft <= 10 ? Colors.redAccent : Colors.white,
+                      color: _timeLeft <= 10 ? theme.colorScheme.error : theme.colorScheme.onSurface,
                       fontWeight: FontWeight.bold,
                       fontSize: 16.0,
                     ),
@@ -203,51 +192,48 @@ class _QuizScreenState extends State<QuizScreen> {
                 ],
               ),
               const SizedBox(height: 24.0),
-
-              // Question status
               Text(
                 'QUESTION ${_currentQuestionIndex + 1} OF ${widget.subject.questions.length}',
                 style: GoogleFonts.inter(
-                  color: const Color(0xFF6366F1),
+                  color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w600,
                   fontSize: 12.0,
                   letterSpacing: 1.2,
                 ),
               ),
               const SizedBox(height: 12.0),
-
-              // Question card
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(24.0),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.04),
-                  borderRadius: BorderRadius.circular(24.0),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.08),
-                    width: 1.0,
+              Card(
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.0),
+                  side: BorderSide(
+                    color: theme.colorScheme.outlineVariant.withOpacity(0.5),
                   ),
                 ),
-                child: Text(
-                  currentQuestion.questionText,
-                  style: GoogleFonts.outfit(
-                    color: Colors.white,
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    height: 1.4,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      currentQuestion.questionText,
+                      style: GoogleFonts.outfit(
+                        color: theme.colorScheme.onSurface,
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        height: 1.4,
+                      ),
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(height: 32.0),
-
-              // Options list
+              const SizedBox(height: 24.0),
               Expanded(
                 child: ListView.builder(
                   itemCount: currentQuestion.options.length,
                   physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (context, idx) {
                     final optionText = currentQuestion.options[idx];
-                    return _buildOptionButton(idx, optionText, currentQuestion);
+                    return _buildOptionButton(theme, idx, optionText, currentQuestion);
                   },
                 ),
               ),
@@ -258,35 +244,32 @@ class _QuizScreenState extends State<QuizScreen> {
     );
   }
 
-  Widget _buildOptionButton(int idx, String optionText, Question currentQuestion) {
-    Color cardColor = Colors.white.withOpacity(0.04);
-    Color borderColor = Colors.white.withOpacity(0.08);
-    Color textColor = Colors.white;
+  Widget _buildOptionButton(ThemeData theme, int idx, String optionText, Question currentQuestion) {
+    Color cardColor = theme.colorScheme.surface;
+    Color borderColor = theme.colorScheme.outlineVariant;
+    Color textColor = theme.colorScheme.onSurface;
 
     if (_isAnswered) {
       if (idx == currentQuestion.correctAnswerIndex) {
-        // Correct answer gets highlighted green
-        cardColor = Colors.green.withOpacity(0.2);
+        cardColor = Colors.green.withOpacity(0.1);
         borderColor = Colors.green;
-        textColor = Colors.greenAccent;
+        textColor = Colors.green[800]!;
       } else if (idx == _selectedAnswerIndex) {
-        // Selected wrong answer gets highlighted red
-        cardColor = Colors.redAccent.withOpacity(0.2);
-        borderColor = Colors.redAccent;
-        textColor = Colors.redAccent;
+        cardColor = theme.colorScheme.errorContainer.withOpacity(0.5);
+        borderColor = theme.colorScheme.error;
+        textColor = theme.colorScheme.error;
       }
     } else {
-      // Not answered yet, checking highlight hover/tap state simulation via border
       if (_selectedAnswerIndex == idx) {
-        borderColor = const Color(0xFF6366F1);
+        borderColor = theme.colorScheme.primary;
       }
     }
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16.0),
+      margin: const EdgeInsets.only(bottom: 12.0),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(18.0),
+        borderRadius: BorderRadius.circular(12.0),
         border: Border.all(
           color: borderColor,
           width: 1.5,
@@ -296,45 +279,44 @@ class _QuizScreenState extends State<QuizScreen> {
         color: Colors.transparent,
         child: InkWell(
           onTap: () => _selectAnswer(idx),
-          borderRadius: BorderRadius.circular(18.0),
+          borderRadius: BorderRadius.circular(12.0),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 18.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
             child: Row(
               children: [
-                // Option symbol (A, B, C, D)
                 Container(
-                  width: 32.0,
-                  height: 32.0,
+                  width: 28.0,
+                  height: 28.0,
                   decoration: BoxDecoration(
                     color: _isAnswered && idx == currentQuestion.correctAnswerIndex
                         ? Colors.green
                         : _isAnswered && idx == _selectedAnswerIndex
-                            ? Colors.redAccent
-                            : Colors.white.withOpacity(0.1),
+                            ? theme.colorScheme.error
+                            : theme.colorScheme.outlineVariant.withOpacity(0.5),
                     shape: BoxShape.circle,
                   ),
                   child: Center(
                     child: Text(
-                      String.fromCharCode(65 + idx), // A, B, C, D
+                      String.fromCharCode(65 + idx),
                       style: TextStyle(
                         color: _isAnswered &&
                                 (idx == currentQuestion.correctAnswerIndex ||
                                     idx == _selectedAnswerIndex)
                             ? Colors.white
-                            : Colors.white70,
-                        fontSize: 14.0,
+                            : theme.colorScheme.onSurface,
+                        fontSize: 12.0,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 16.0),
+                const SizedBox(width: 12.0),
                 Expanded(
                   child: Text(
                     optionText,
                     style: TextStyle(
                       color: textColor,
-                      fontSize: 16.0,
+                      fontSize: 15.0,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -342,7 +324,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 if (_isAnswered && idx == currentQuestion.correctAnswerIndex)
                   const Icon(Icons.check_circle_rounded, color: Colors.green)
                 else if (_isAnswered && idx == _selectedAnswerIndex)
-                  const Icon(Icons.cancel_rounded, color: Colors.redAccent),
+                  Icon(Icons.cancel_rounded, color: theme.colorScheme.error),
               ],
             ),
           ),
